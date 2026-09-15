@@ -1,0 +1,8 @@
+[Unit]
+Description=Generate the daily SentryLog security digest
+Documentation=file:/usr/local/bin/sentrylog.sh
+
+[Service]
+Type=oneshot
+User=root
+ExecStart=/usr/local/bin/sentrylog.sh

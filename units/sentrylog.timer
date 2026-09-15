@@ -1,0 +1,12 @@
+[Unit]
+Description=Run the SentryLog security digest daily at 06:00
+
+[Timer]
+OnCalendar=*-*-* 06:00:00
+
+Persistent=true
+
+Unit=sentrylog.service
+
+[Install]
+WantedBy=timers.target
