@@ -1,0 +1,1029 @@
+auritro@localhost:~$ mksir SentryLog
+bash: mksir: command not found...
+auritro@localhost:~$ mkdir SentryLog
+auritro@localhost:~$ cd SentryLog/
+auritro@localhost:~/SentryLog$ mkdir units
+auritro@localhost:~/SentryLog$ ls
+units
+auritro@localhost:~/SentryLog$ nano sentrylog.sh
+auritro@localhost:~/SentryLog$ 
+
+auritro@localhost:~/SentryLog$ chmod +x sentrylog.sh
+auritro@localhost:~/SentryLog$ ls -l sentrylog.sh
+-rwxr-xr-x. 1 auritro auritro 2863 Sep 15 16:56 sentrylog.sh
+
+auritro@localhost:~/SentryLog$ nano units/sentrylog.service
+auritro@localhost:~/SentryLog$ nano units/sentrylog.timer
+auritro@localhost:~/SentryLog$ nano units/cron-sentrylog
+auritro@localhost:~/SentryLog$ nano units/tmpfiles-sentrylog.conf
+
+auritro@localhost:~/SentryLog$ ls -l
+total 4
+-rwxr-xr-x. 1 auritro auritro 2863 Sep 15 16:56 sentrylog.sh
+drwxr-xr-x. 2 auritro auritro  107 Sep 15 17:30 units
+auritro@localhost:~/SentryLog$ ls -l units/
+total 16
+-rw-r--r--. 1 auritro auritro 112 Sep 15 17:29 cron-sentrylog
+-rw-r--r--. 1 auritro auritro 183 Sep 15 17:26 sentrylog.service
+-rw-r--r--. 1 auritro auritro 178 Sep 15 17:26 sentrylog.timer
+-rw-r--r--. 1 auritro auritro 162 Sep 15 17:30 tmpfiles-sentrylog.conf
+
+auritro@localhost:~/SentryLog$ timedatectl
+               Local time: Tue 2026-09-15 17:33:30 IST
+           Universal time: Tue 2026-09-15 12:03:30 UTC
+                 RTC time: Tue 2026-09-15 12:03:30
+                Time zone: Asia/Kolkata (IST, +0530)
+System clock synchronized: yes
+              NTP service: active
+          RTC in local TZ: no
+auritro@localhost:~/SentryLog$ chronyc sources -v
+
+  .-- Source mode  '^' = server, '=' = peer, '#' = local clock.
+ / .- Source state '*' = current best, '+' = combined, '-' = not combined,
+| /             'x' = may be in error, '~' = too variable, '?' = unusable.
+||                                                 .- xxxx [ yyyy ] +/- zzzz
+||      Reachability register (octal) -.           |  xxxx = adjusted offset,
+||      Log2(Polling interval) --.      |          |  yyyy = measured offset,
+||                                \     |          |  zzzz = estimated error.
+||                                 |    |           \
+MS Name/IP address         Stratum Poll Reach LastRx Last sample               
+===============================================================================
+^+ ntp5.mum-in.hosts.301-mo>     2  10   377    15    -15ms[  -15ms] +/-   87ms
+^+ 139.59.55.93                  2  10   377   984  -2652us[-2992us] +/-   41ms
+^+ ec2-3-7-223-15.ap-south->     2  10   377   504  -1491us[-1491us] +/-   38ms
+^* 172-236-180-15.ip.linode>     5  10   377   932  -6323us[-6664us] +/-   44ms
+auritro@localhost:~/SentryLog$ systemctl is-active chronyd
+active
+auritro@localhost:~/SentryLog$ systemctl is-enabled chronyd
+enabled
+auritro@localhost:~/SentryLog$ grep -E '^(server|pool)' /etc/chrony.conf
+pool 2.rhel.pool.ntp.org iburst
+
+auritro@localhost:~/SentryLog$ ls /var/log/journal
+ls: cannot access '/var/log/journal': No such file or directory
+auritro@localhost:~/SentryLog$ journalctl --list-boots
+IDX BOOT ID                          FIRST ENTRY                 LAST ENTRY                 
+  0 e3d9b17b4e3f41ac9dd924820873a2d1 Wed 2026-06-24 19:34:12 IST Tue 2026-09-15 17:40:18 IST
+auritro@localhost:~/SentryLog$ sudo mkdir /var/log/journal
+[sudo] password for auritro: 
+auritro@localhost:~/SentryLog$ sudo journalctl --flush
+auritro@localhost:~/SentryLog$ sudo ls /var/log/journal
+6385b12322774591b8bf9289a42027af
+auritro@localhost:~/SentryLog$ sudo ls -l /var/log/journal/*/
+total 59284
+-rw-r-----. 1 root root 50331648 Sep 15 17:40 system@0234e8a2c63340138fa645dbe5178268-0000000000000001-00065500599e5fdb.journal
+-rw-r-----. 1 root root  8388608 Sep 15 17:41 system.journal
+-rw-r-----+ 1 root root  8388608 Sep 15 17:41 user-1000.journal
+
+auritro@localhost:~$ cd ~/SentryLog
+auritro@localhost:~/SentryLog$ journalctl --list-boots
+IDX BOOT ID                          FIRST ENTRY                 LAST ENTRY                 
+ -1 e3d9b17b4e3f41ac9dd924820873a2d1 Tue 2026-09-15 17:40:46 IST Tue 2026-09-15 17:44:30 IST
+  0 5a3a323686f24fa7a35f1438324ae8e0 Tue 2026-09-15 17:44:44 IST Tue 2026-09-15 17:46:39 IST
+auritro@localhost:~/SentryLog$ sudo journalctl -b -1 -n 10
+[sudo] password for auritro: 
+Sep 15 17:44:30 localhost.localdomain systemd[1]: Reached target shutdown.target - System Shutdown.
+Sep 15 17:44:30 localhost.localdomain systemd[1]: Reached target final.target - Late Shutdown Services.
+Sep 15 17:44:30 localhost.localdomain systemd[1]: systemd-reboot.service: Deactivated successfully.
+Sep 15 17:44:30 localhost.localdomain systemd[1]: Finished systemd-reboot.service - System Reboot.
+Sep 15 17:44:30 localhost.localdomain kernel: audit: type=1130 audit(1789474470.017:1953): pid=1 uid=0 auid=4294967295 ses=4294967295 subj=system_u:system_r:>
+Sep 15 17:44:30 localhost.localdomain systemd[1]: Reached target reboot.target - System Reboot.
+Sep 15 17:44:30 localhost.localdomain systemd[1]: Shutting down.
+Sep 15 17:44:30 localhost.localdomain systemd-shutdown[1]: Syncing filesystems and block devices.
+Sep 15 17:44:30 localhost.localdomain systemd-shutdown[1]: Sending SIGTERM to remaining processes...
+Sep 15 17:44:30 localhost.localdomain systemd-journald[1006]: Journal stopped
+
+auritro@localhost:~/SentryLog$ sudo journalctl -b -1 | tail -5
+Sep 15 17:44:30 localhost.localdomain systemd[1]: Reached target reboot.target - System Reboot.
+Sep 15 17:44:30 localhost.localdomain systemd[1]: Shutting down.
+Sep 15 17:44:30 localhost.localdomain systemd-shutdown[1]: Syncing filesystems and block devices.
+Sep 15 17:44:30 localhost.localdomain systemd-shutdown[1]: Sending SIGTERM to remaining processes...
+Sep 15 17:44:30 localhost.localdomain systemd-journald[1006]: Journal stopped
+auritro@localhost:~/SentryLog$ sudo journalctl -b -n 5
+Sep 15 17:47:31 localhost.localdomain systemd[3652]: Reached target default.target - Main User Target.
+Sep 15 17:47:31 localhost.localdomain systemd[3652]: Startup finished in 539ms.
+Sep 15 17:47:31 localhost.localdomain systemd[1]: Started user@0.service - User Manager for UID 0.
+Sep 15 17:47:31 localhost.localdomain systemd[1]: Started session-c4.scope - Session c4 of User root.
+Sep 15 17:47:31 localhost.localdomain sudo[3648]: pam_unix(sudo:session): session opened for user root(uid=0) by auritro(uid=1000)
+
+PS C:\Users\Auritro\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Windows PowerShell> ssh baduser@192.168.73.130
+
+The authenticity of host '192.168.73.130 (192.168.73.130)' can't be established.
+ED25519 key fingerprint is SHA256:+NhY/o1PdXtU77c8O1WudpXN0jB52WPSkM+TnsvEOU8.
+This key is not known by any other names.
+Are you sure you want to continue connecting (yes/no/[fingerprint])? y
+Please type 'yes', 'no' or the fingerprint: yes
+Warning: Permanently added '192.168.73.130' (ED25519) to the list of known hosts.
+baduser@192.168.73.130's password:
+Permission denied, please try again.
+baduser@192.168.73.130's password:
+Permission denied, please try again.
+baduser@192.168.73.130's password:
+baduser@192.168.73.130: Permission denied (publickey,gssapi-keyex,gssapi-with-mic,password).
+
+auritro@localhost:~/SentryLog$ su - dev2
+Password: 
+su: Authentication failure
+auritro@localhost:~/SentryLog$ su - dev2
+Password: 
+su: Authentication failure
+auritro@localhost:~/SentryLog$ su - dev2
+Password: 
+su: Authentication failure
+
+auritro@localhost:~/SentryLog$ sudo journalctl --since "-20 minutes" | grep -E 'Failed password|Invalid user|authentication failure' | tail -15
+[sudo] password for auritro: 
+Sep 15 17:50:43 localhost.localdomain sshd-session[3685]: Invalid user baduser from 192.168.73.1 port 49244
+Sep 15 17:50:45 localhost.localdomain sshd-session[3685]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=192.168.73.1
+Sep 15 17:50:47 localhost.localdomain sshd-session[3685]: Failed password for invalid user baduser from 192.168.73.1 port 49244 ssh2
+Sep 15 17:50:53 localhost.localdomain sshd-session[3685]: Failed password for invalid user baduser from 192.168.73.1 port 49244 ssh2
+Sep 15 17:50:57 localhost.localdomain sshd-session[3685]: Failed password for invalid user baduser from 192.168.73.1 port 49244 ssh2
+Sep 15 17:50:58 localhost.localdomain sshd-session[3685]: PAM 2 more authentication failures; logname= uid=0 euid=0 tty=ssh ruser= rhost=192.168.73.1
+Sep 15 17:51:37 localhost.localdomain su[3696]: pam_unix(su-l:auth): authentication failure; logname=auritro uid=1000 euid=0 tty=/dev/pts/0 ruser=auritro rhost=  user=dev2
+Sep 15 17:51:53 localhost.localdomain su[3707]: pam_unix(su-l:auth): authentication failure; logname=auritro uid=1000 euid=0 tty=/dev/pts/0 ruser=auritro rhost=  user=dev2
+Sep 15 17:52:00 localhost.localdomain su[3711]: pam_unix(su-l:auth): authentication failure; logname=auritro uid=1000 euid=0 tty=/dev/pts/0 ruser=auritro rhost=  user=dev2
+
+auritro@localhost:~/SentryLog$ sudo cp sentrylog.sh /usr/local/bin/sentrylog.sh
+auritro@localhost:~/SentryLog$ sudo chmod +x /usr/local/bin/sentrylog.sh
+auritro@localhost:~/SentryLog$ ls -l /usr/local/bin/sentrylog.sh
+-rwxr-xr-x. 1 root root 2863 Sep 15 17:55 /usr/local/bin/sentrylog.sh
+
+Sep 15 17:44:10 localhost.localdomain kernel: [drm:vmw_kms_fb_create [vmwgfx]] *ERROR* failed to create vmw_framebuffer: -22
+Sep 15 17:44:10 localhost.localdomain kernel: [drm:vmw_kms_fb_create [vmwgfx]] *ERROR* failed to create vmw_framebuffer: -22
+Sep 15 17:44:10 localhost.localdomain kernel: [drm:vmw_kms_fb_create [vmwgfx]] *ERROR* failed to create vmw_framebuffer: -22
+Sep 15 17:44:10 localhost.localdomain kernel: [drm:vmw_kms_fb_create [vmwgfx]] *ERROR* failed to create vmw_framebuffer: -22
+Sep 15 17:44:10 localhost.localdomain kernel: [drm:vmw_kms_fb_create [vmwgfx]] *ERROR* failed to create vmw_framebuffer: -22
+Sep 15 17:44:10 localhost.localdomain kernel: [drm:vmw_kms_fb_create [vmwgfx]] *ERROR* failed to create vmw_framebuffer: -22
+Sep 15 17:44:10 localhost.localdomain kernel: [drm:vmw_kms_fb_create [vmwgfx]] *ERROR* failed to create vmw_framebuffer: -22
+Sep 15 17:44:10 localhost.localdomain kernel: [drm:vmw_kms_fb_create [vmwgfx]] *ERROR* failed to create vmw_framebuffer: -22
+Sep 15 17:44:10 localhost.localdomain kernel: [drm:vmw_kms_fb_create [vmwgfx]] *ERROR* failed to create vmw_framebuffer: -22
+Sep 15 17:44:10 localhost.localdomain kernel: [drm:vmw_kms_fb_create [vmwgfx]] *ERROR* failed to create vmw_framebuffer: -22
+Sep 15 17:44:10 localhost.localdomain kernel: [drm:vmw_kms_fb_create [vmwgfx]] *ERROR* failed to create vmw_framebuffer: -22
+Sep 15 17:44:10 localhost.localdomain kernel: [drm:vmw_kms_fb_create [vmwgfx]] *ERROR* failed to create vmw_framebuffer: -22
+Sep 15 17:44:10 localhost.localdomain kernel: [drm:vmw_kms_fb_create [vmwgfx]] *ERROR* failed to create vmw_framebuffer: -22
+Sep 15 17:44:10 localhost.localdomain kernel: [drm:vmw_kms_fb_create [vmwgfx]] *ERROR* failed to create vmw_framebuffer: -22
+Sep 15 17:44:10 localhost.localdomain kernel: [drm:vmw_kms_fb_create [vmwgfx]] *ERROR* failed to create vmw_framebuffer: -22
+Sep 15 17:44:10 localhost.localdomain kernel: [drm:vmw_kms_fb_create [vmwgfx]] *ERROR* failed to create vmw_framebuffer: -22
+Sep 15 17:44:10 localhost.localdomain kernel: [drm:vmw_kms_fb_create [vmwgfx]] *ERROR* failed to create vmw_framebuffer: -22
+Sep 15 17:44:10 localhost.localdomain kernel: [drm:vmw_kms_fb_create [vmwgfx]] *ERROR* failed to create vmw_framebuffer: -22
+Sep 15 17:44:10 localhost.localdomain kernel: [drm:vmw_kms_fb_create [vmwgfx]] *ERROR* failed to create vmw_framebuffer: -22
+Sep 15 17:44:10 localhost.localdomain kernel: [drm:vmw_kms_fb_create [vmwgfx]] *ERROR* failed to create vmw_framebuffer: -22
+Sep 15 17:44:10 localhost.localdomain kernel: [drm:vmw_kms_fb_create [vmwgfx]] *ERROR* failed to create vmw_framebuffer: -22
+Sep 15 17:44:11 localhost.localdomain kernel: [drm:vmw_kms_fb_create [vmwgfx]] *ERROR* failed to create vmw_framebuffer: -22
+Sep 15 17:44:11 localhost.localdomain kernel: [drm:vmw_kms_fb_create [vmwgfx]] *ERROR* failed to create vmw_framebuffer: -22
+Sep 15 17:44:11 localhost.localdomain kernel: [drm:vmw_kms_fb_create [vmwgfx]] *ERROR* failed to create vmw_framebuffer: -22
+Sep 15 17:44:11 localhost.localdomain kernel: [drm:vmw_kms_fb_create [vmwgfx]] *ERROR* failed to create vmw_framebuffer: -22
+Sep 15 17:44:12 localhost.localdomain kernel: [drm:vmw_kms_fb_create [vmwgfx]] *ERROR* failed to create vmw_framebuffer: -22
+Sep 15 17:44:12 localhost.localdomain kernel: [drm:vmw_kms_fb_create [vmwgfx]] *ERROR* failed to create vmw_framebuffer: -22
+Sep 15 17:44:12 localhost.localdomain kernel: [drm:vmw_kms_fb_create [vmwgfx]] *ERROR* failed to create vmw_framebuffer: -22
+Sep 15 17:44:12 localhost.localdomain kernel: [drm:vmw_kms_fb_create [vmwgfx]] *ERROR* failed to create vmw_framebuffer: -22
+Sep 15 17:44:12 localhost.localdomain kernel: [drm:vmw_kms_fb_create [vmwgfx]] *ERROR* failed to create vmw_framebuffer: -22
+Sep 15 17:44:12 localhost.localdomain kernel: [drm:vmw_kms_fb_create [vmwgfx]] *ERROR* failed to create vmw_framebuffer: -22
+Sep 15 17:44:12 localhost.localdomain kernel: [drm:vmw_kms_fb_create [vmwgfx]] *ERROR* failed to create vmw_framebuffer: -22
+Sep 15 17:44:12 localhost.localdomain kernel: [drm:vmw_kms_fb_create [vmwgfx]] *ERROR* failed to create vmw_framebuffer: -22
+Sep 15 17:44:17 localhost.localdomain kernel: [drm:vmw_kms_fb_create [vmwgfx]] *ERROR* failed to create vmw_framebuffer: -22
+Sep 15 17:44:17 localhost.localdomain kernel: [drm:vmw_kms_fb_create [vmwgfx]] *ERROR* failed to create vmw_framebuffer: -22
+Sep 15 17:44:19 localhost.localdomain dbus-broker-launch[1178]: Activation request for 'org.freedesktop.ColorManager' failed.
+Sep 15 17:44:21 localhost.localdomain dbus-broker-launch[1178]: Activation request for 'org.freedesktop.nm_dispatcher' failed.
+Sep 15 17:44:29 localhost.localdomain auditd[1139]: plugin /usr/sbin/sedispatch terminated unexpectedly
+-- Boot 5a3a323686f24fa7a35f1438324ae8e0 --
+Sep 15 17:44:44 localhost kernel: [Firmware Bug]: cpu 0, try to use APIC520 (LVT offset 2) for vector 0xf4, but the register is already in use for vector 0x0 on this cpu
+Sep 15 17:44:44 localhost kernel: [Firmware Bug]: cpu 1, try to use APIC520 (LVT offset 2) for vector 0xf4, but the register is already in use for vector 0x0 on this cpu
+Sep 15 17:44:45 localhost kernel: Warning: Unmaintained driver is detected: cnic
+Sep 15 17:44:45 localhost kernel: Warning: Unmaintained driver is detected: cnic_init
+Sep 15 17:44:45 localhost kernel: Warning: Unmaintained driver is detected: bnx2i
+Sep 15 17:44:45 localhost kernel: Warning: Unmaintained driver is detected: bnx2i_mod_init
+Sep 15 17:44:58 localhost systemd[1]: Failed to mount run-vmblock\x2dfuse.mount - VMware vmblock Fuse Mount.
+Sep 15 17:45:06 localhost kernel: piix4_smbus 0000:00:07.3: SMBus base address uninitialized - upgrade BIOS or use force_addr=0xaddr
+Sep 15 17:45:09 localhost alsactl[1315]: alsa-lib main.c:1554:(snd_use_case_mgr_open) error: failed to import hw:0 use case configuration -2
+Sep 15 17:45:30 localhost.localdomain gdm-password][2478]: gkr-pam: unable to locate daemon control file
+Sep 15 17:45:40 localhost.localdomain systemd[2489]: Failed to start app-gnome-user\x2ddirs\x2dupdate\x2dgtk-2759.scope - Application launched by gnome-session-binary.
+Sep 15 17:45:40 localhost.localdomain systemd[2489]: Failed to start app-gnome-vmware\x2duser-2761.scope - Application launched by gnome-session-binary.
+
+4. FAILURES BY SOURCE IP
+  192.168.73.1  6 failures  SUSPECT
+
+Suspect addresses: 1
+
+5. SUMMARY
+Failed authentication attempts : 10
+Service failures               : 9
+Entries at err or above        : 78464
+
+End of report.
+
+auritro@localhost:~/SentryLog$ sudo cp units/sentrylog.service /etc/systemd/system/sentrylog.service
+auritro@localhost:~/SentryLog$ sudo cp units/sentrylog.timer /etc/systemd/system/sentrylog.timer
+auritro@localhost:~/SentryLog$ sudo chmod 0644 /etc/systemd/system/sentrylog.service /etc/systemd/system/sentrylog.timer
+auritro@localhost:~/SentryLog$ sudo systemctl daemon-reload
+auritro@localhost:~/SentryLog$ sudo nano /etc/systemd/system/sentrylog.timer
+auritro@localhost:~/SentryLog$ sudo systemctl daemon-reload
+auritro@localhost:~/SentryLog$ sudo systemctl enable --now sentrylog.timer
+Created symlink '/etc/systemd/system/timers.target.wants/sentrylog.timer' → '/etc/systemd/system/sentrylog.timer'.
+auritro@localhost:~/SentryLog$ systemctl list-timers sentrylog.timer
+NEXT                           LEFT LAST PASSED UNIT            ACTIVATES        
+Tue 2026-09-15 18:10:00 IST 2min 0s -         - sentrylog.timer sentrylog.service
+
+1 timers listed.
+Pass --all to see loaded but inactive timers, too.
+auritro@localhost:~/SentryLog$ systemctl status sentrylog.timer
+● sentrylog.timer - Run the SentryLog security digest daily at 06:00
+     Loaded: loaded (/etc/systemd/system/sentrylog.timer; enabled; preset: disabled)
+     Active: active (waiting) since Tue 2026-09-15 18:07:35 IST; 32s ago
+ Invocation: 65004700dbd0498b842bd268943ec1d8
+    Trigger: Tue 2026-09-15 18:10:00 IST; 1min 52s left
+   Triggers: ● sentrylog.service
+
+Sep 15 18:07:35 localhost.localdomain systemd[1]: Started sentrylog.timer - Run the SentryLog security digest daily at 06:00.
+
+auritro@localhost:~/SentryLog$ systemctl list-timers sentrylog.timer
+NEXT                            LEFT LAST                             PASSED UNIT            ACTIVATES        
+Tue 2026-09-15 18:35:00 IST 3min 41s Tue 2026-09-15 18:30:10 IST 1min 8s ago sentrylog.timer sentrylog.service
+
+1 timers listed.
+Pass --all to see loaded but inactive timers, too.
+auritro@localhost:~/SentryLog$ sudo journalctl -u sentrylog.service --since "-25 minutes"
+[sudo] password for auritro: 
+Sep 15 18:10:12 localhost.localdomain systemd[1]: Starting sentrylog.service - Generate the daily SentryLog security digest...
+Sep 15 18:10:14 localhost.localdomain sentrylog.sh[4464]: Report written to /var/log/sentrylog/security_report_2026-09-15.txt
+Sep 15 18:10:14 localhost.localdomain systemd[1]: sentrylog.service: Deactivated successfully.
+Sep 15 18:10:14 localhost.localdomain systemd[1]: Finished sentrylog.service - Generate the daily SentryLog security digest.
+Sep 15 18:10:14 localhost.localdomain systemd[1]: sentrylog.service: Consumed 1.406s CPU time, 24.5M memory peak.
+Sep 15 18:15:10 localhost.localdomain systemd[1]: Starting sentrylog.service - Generate the daily SentryLog security digest...
+Sep 15 18:15:12 localhost.localdomain sentrylog.sh[4497]: Report written to /var/log/sentrylog/security_report_2026-09-15.txt
+Sep 15 18:15:12 localhost.localdomain systemd[1]: sentrylog.service: Deactivated successfully.
+Sep 15 18:15:12 localhost.localdomain systemd[1]: Finished sentrylog.service - Generate the daily SentryLog security digest.
+Sep 15 18:15:12 localhost.localdomain systemd[1]: sentrylog.service: Consumed 1.451s CPU time, 24.3M memory peak.
+Sep 15 18:20:12 localhost.localdomain systemd[1]: Starting sentrylog.service - Generate the daily SentryLog security digest...
+Sep 15 18:20:14 localhost.localdomain sentrylog.sh[4542]: Report written to /var/log/sentrylog/security_report_2026-09-15.txt
+Sep 15 18:20:14 localhost.localdomain systemd[1]: sentrylog.service: Deactivated successfully.
+Sep 15 18:20:14 localhost.localdomain systemd[1]: Finished sentrylog.service - Generate the daily SentryLog security digest.
+Sep 15 18:20:14 localhost.localdomain systemd[1]: sentrylog.service: Consumed 1.397s CPU time, 24.4M memory peak.
+Sep 15 18:25:12 localhost.localdomain systemd[1]: Starting sentrylog.service - Generate the daily SentryLog security digest...
+Sep 15 18:25:14 localhost.localdomain sentrylog.sh[4587]: Report written to /var/log/sentrylog/security_report_2026-09-15.txt
+Sep 15 18:25:14 localhost.localdomain systemd[1]: sentrylog.service: Deactivated successfully.
+Sep 15 18:25:14 localhost.localdomain systemd[1]: Finished sentrylog.service - Generate the daily SentryLog security digest.
+Sep 15 18:25:14 localhost.localdomain systemd[1]: sentrylog.service: Consumed 1.430s CPU time, 24.4M memory peak.
+Sep 15 18:30:10 localhost.localdomain systemd[1]: Starting sentrylog.service - Generate the daily SentryLog security digest...
+Sep 15 18:30:12 localhost.localdomain sentrylog.sh[4618]: Report written to /var/log/sentrylog/security_report_2026-09-15.txt
+Sep 15 18:30:12 localhost.localdomain systemd[1]: sentrylog.service: Deactivated successfully.
+Sep 15 18:30:12 localhost.localdomain systemd[1]: Finished sentrylog.service - Generate the daily SentryLog security digest.
+Sep 15 18:30:12 localhost.localdomain systemd[1]: sentrylog.service: Consumed 1.403s CPU time, 24.2M memory peak.
+auritro@localhost:~/SentryLog$ sudo ls -l /var/log/sentrylog/
+total 9584
+-rw-r--r--. 1 root root 9811059 Sep 15 18:30 security_report_2026-09-15.txt
+auritro@localhost:~/SentryLog$ sudo nano /etc/systemd/system/sentrylog.timer
+
+auritro@localhost:~/SentryLog$ sudo systemctl daemon-reload
+auritro@localhost:~/SentryLog$ sudo systemctl restart sentrylog.timer
+auritro@localhost:~/SentryLog$ systemctl cat sentrylog.timer
+# /etc/systemd/system/sentrylog.timer
+[Unit]
+Description=Run the SentryLog security digest daily at 06:00
+
+[Timer]
+OnCalendar=*-*-* 06:00:00
+
+Persistent=true
+
+Unit=sentrylog.service
+
+[Install]
+WantedBy=timers.target
+auritro@localhost:~/SentryLog$ systemctl list-timers sentrylog.timer
+NEXT                        LEFT LAST                        PASSED UNIT            ACTIVATES        
+Wed 2026-09-16 06:00:00 IST  11h Tue 2026-09-15 18:35:12 IST      - sentrylog.timer sentrylog.service
+
+1 timers listed.
+Pass --all to see loaded but inactive timers, too.
+auritro@localhost:~/SentryLog$ systemctl is-enabled sentrylog.timer
+enabled
+
+auritro@localhost:~/SentryLog$ sudo cp units/cron-sentrylog /etc/cron.d/sentrylog
+auritro@localhost:~/SentryLog$ sudo chmod 0644 /etc/cron.d/sentrylog
+auritro@localhost:~/SentryLog$ sudo cat /etc/cron.d/sentrylog
+SHELL=/bin/bash
+PATH=/sbin:/bin:/usr/sbin:/usr/bin
+MAILTO=root
+
+0 6 * * * root /usr/local/bin/sentrylog.sh cron
+auritro@localhost:~/SentryLog$ systemctl is-active crond
+active
+auritro@localhost:~/SentryLog$ sudo nano /etc/cron.d/sentrylog
+auritro@localhost:~/SentryLog$ 
+
+auritro@localhost:~/SentryLog$ sudo ls -l /var/log/sentrylog/
+[sudo] password for auritro: 
+total 19168
+-rw-r--r--. 1 root root 9811059 Sep 15 18:50 security_report_2026-09-15_cron.txt
+-rw-r--r--. 1 root root 9811059 Sep 15 18:35 security_report_2026-09-15.txt
+auritro@localhost:~/SentryLog$ sudo journalctl -t CROND --since "-15 minutes"
+Sep 15 18:45:01 localhost.localdomain CROND[5100]: (root) CMD (/usr/local/bin/sentrylog.sh cron)
+Sep 15 18:45:02 localhost.localdomain CROND[5099]: (root) CMDOUT (Report written to /var/log/sentrylog/security_report_2026-09-15_cron.txt)
+Sep 15 18:45:02 localhost.localdomain CROND[5099]: (root) CMDEND (/usr/local/bin/sentrylog.sh cron)
+Sep 15 18:50:01 localhost.localdomain CROND[5160]: (root) CMD (/usr/local/bin/sentrylog.sh cron)
+Sep 15 18:50:03 localhost.localdomain CROND[5159]: (root) CMDOUT (Report written to /var/log/sentrylog/security_report_2026-09-15_cron.txt)
+Sep 15 18:50:03 localhost.localdomain CROND[5159]: (root) CMDEND (/usr/local/bin/sentrylog.sh cron)
+auritro@localhost:~/SentryLog$ sudo nano /etc/cron.d/sentrylog
+auritro@localhost:~/SentryLog$ sudo cat /etc/cron.d/sentrylog
+SHELL=/bin/bash
+PATH=/sbin:/bin:/usr/sbin:/usr/bin
+MAILTO=root
+
+0 6 * * * root /usr/local/bin/sentrylog.sh cron
+
+auritro@localhost:~/SentryLog$ sudo cp units/tmpfiles-sentrylog.conf /etc/tmpfiles.d/sentrylog.conf
+auritro@localhost:~/SentryLog$ sudo chmod 0644 /etc/tmpfiles.d/sentrylog.conf
+auritro@localhost:~/SentryLog$ cat /etc/tmpfiles.d/sentrylog.conf
+# SentryLog report retention
+# Installed as /etc/tmpfiles.d/sentrylog.conf
+#
+# Type Path               Mode UID  GID  Age
+d /var/log/sentrylog 0700 root root 30d
+auritro@localhost:~/SentryLog$ sudo systemd-tmpfiles --create /etc/tmpfiles.d/sentrylog.conf
+auritro@localhost:~/SentryLog$ echo $?
+0
+auritro@localhost:~/SentryLog$ sudo touch -d "40 days ago" /var/log/sentrylog/security_report_2026-08-06.txt
+auritro@localhost:~/SentryLog$ sudo ls -l --time-style=long-iso /var/log/sentrylog/
+total 19168
+-rw-r--r--. 1 root root       0 2026-08-06 18:54 security_report_2026-08-06.txt
+-rw-r--r--. 1 root root 9811059 2026-09-15 18:50 security_report_2026-09-15_cron.txt
+-rw-r--r--. 1 root root 9811059 2026-09-15 18:35 security_report_2026-09-15.txt
+auritro@localhost:~/SentryLog$ sudo systemd-tmpfiles --clean /etc/tmpfiles.d/sentrylog.conf
+auritro@localhost:~/SentryLog$ echo $?
+0
+auritro@localhost:~/SentryLog$ sudo ls -l --time-style=long-iso /var/log/sentrylog/
+total 19168
+-rw-r--r--. 1 root root       0 2026-08-06 18:54 security_report_2026-08-06.txt
+-rw-r--r--. 1 root root 9811059 2026-09-15 18:50 security_report_2026-09-15_cron.txt
+-rw-r--r--. 1 root root 9811059 2026-09-15 18:35 security_report_2026-09-15.txt
+auritro@localhost:~/SentryLog$ sudo systemd-tmpfiles --clean /etc/tmpfiles.d/sentrylog.conf
+auritro@localhost:~/SentryLog$ echo $?
+0
+auritro@localhost:~/SentryLog$ sudo ls -l --time-style=long-iso /var/log/sentrylog/
+total 19168
+-rw-r--r--. 1 root root       0 2026-08-06 18:54 security_report_2026-08-06.txt
+-rw-r--r--. 1 root root 9811059 2026-09-15 18:50 security_report_2026-09-15_cron.txt
+-rw-r--r--. 1 root root 9811059 2026-09-15 18:35 security_report_2026-09-15.txt
+auritro@localhost:~/SentryLog$ systemctl status systemd-tmpfiles-clean.timer
+● systemd-tmpfiles-clean.timer - Daily Cleanup of Temporary Directories
+     Loaded: loaded (/usr/lib/systemd/system/systemd-tmpfiles-clean.timer; static)
+     Active: active (waiting) since Tue 2026-09-15 17:45:03 IST; 1h 11min ago
+ Invocation: c16f41cae4e1444582ac215168024495
+    Trigger: Wed 2026-09-16 18:00:10 IST; 23h left
+   Triggers: ● systemd-tmpfiles-clean.service
+       Docs: man:tmpfiles.d(5)
+             man:systemd-tmpfiles(8)
+
+Sep 15 17:45:03 localhost systemd[1]: Started systemd-tmpfiles-clean.timer - Daily Cleanup of Temporary Directories.
+
+auritro@localhost:~/SentryLog$ sudo cp /var/log/sentrylog/security_report_$(date +%F).txt .
+[sudo] password for auritro: 
+auritro@localhost:~/SentryLog$ sudo chown auritro:auritro security_report_$(date +%F).txt
+auritro@localhost:~/SentryLog$ ls -l
+total 9588
+-rw-r--r--. 1 auritro auritro 9811059 Sep 15 19:02 security_report_2026-09-15.txt
+-rwxr-xr-x. 1 auritro auritro    2863 Sep 15 16:56 sentrylog.sh
+drwxr-xr-x. 2 auritro auritro     107 Sep 15 17:30 units
+
+auritro@localhost:~/SentryLog$ cd ~/SentryLog
+auritro@localhost:~/SentryLog$ cat > sentrylog.sh << 'EOF'
+#!/usr/bin/bash
+#
+# SentryLog - automated security digest of the system journal
+#
+# Extracts failed authentication attempts, service failures and
+# high-priority events from the last 24 hours, counts failures per
+# source IP address, and writes a dated report.
+#
+# Usage:  sentrylog.sh [tag]
+#         The optional tag is appended to the report file name so that
+#         the systemd timer and the cron job can run side by side
+#         without overwriting each other's output.
+
+REPORT_DIR="/var/log/sentrylog"
+WINDOW="-24 hours"
+THRESHOLD=5
+MAX_LINES=20
+TAG="$1"
+
+# journalctl exposes the complete journal only to root.
+if [[ $(id -u) -ne 0 ]]; then
+    echo "sentrylog: this script must be run as root" >&2
+    exit 1
+fi
+
+# Mode 0700 matters: the working files below hold raw log lines, and a
+# predictable path in a world-writable directory such as /tmp would be
+# a symlink-attack target for a root-owned process.
+mkdir -p "$REPORT_DIR"
+chmod 0700 "$REPORT_DIR"
+
+DATE=$(date +%F)
+echo "Report written to ${REPORT}"       : ${ERR_COUNT}"NT}"out an IP address.)""t' "$WORK")
+> EOF
+auritro@localhost:~/SentryLog$ wc -l -c sentrylog.sh
+ 141 4873 sentrylog.sh
+auritro@localhost:~/SentryLog$ bash -n sentrylog.sh; echo $?
+0
+
+auritro@localhost:~/SentryLog$ chmod +x sentrylog.sh
+auritro@localhost:~/SentryLog$ sudo cp sentrylog.sh /usr/local/bin/sentrylog.sh
+[sudo] password for auritro: 
+auritro@localhost:~/SentryLog$ sudo chmod +x /usr/local/bin/sentrylog.sh
+auritro@localhost:~/SentryLog$ ls -l /usr/local/bin/sentrylog.sh
+-rwxr-xr-x. 1 root root 4873 Sep 15 19:08 /usr/local/bin/sentrylog.sh
+auritro@localhost:~/SentryLog$ 
+
+auritro@localhost:~/SentryLog$ ssh baduser@127.0.0.1
+The authenticity of host '127.0.0.1 (127.0.0.1)' can't be established.
+ED25519 key fingerprint is SHA256:+NhY/o1PdXtU77c8O1WudpXN0jB52WPSkM+TnsvEOU8.
+This key is not known by any other names.
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+Warning: Permanently added '127.0.0.1' (ED25519) to the list of known hosts.
+baduser@127.0.0.1's password: 
+Permission denied, please try again.
+baduser@127.0.0.1's password: 
+Permission denied, please try again.
+baduser@127.0.0.1's password: 
+baduser@127.0.0.1: Permission denied (publickey,gssapi-keyex,gssapi-with-mic,password).
+auritro@localhost:~/SentryLog$ ssh baduser@127.0.0.1
+baduser@127.0.0.1's password: 
+Permission denied, please try again.
+baduser@127.0.0.1's password: 
+Permission denied, please try again.
+baduser@127.0.0.1's password: 
+baduser@127.0.0.1: Permission denied (publickey,gssapi-keyex,gssapi-with-mic,password).
+auritro@localhost:~/SentryLog$ sudo journalctl --since "-30 minutes" | grep -E 'Failed password|Invalid user' | grep -oE '([0-9]{1,3}\.){3}[0-9]{1,3}' | sort | uniq -c
+      8 127.0.0.1
+
+auritro@localhost:~/SentryLog$ sudo rm -f /var/log/sentrylog/security_report_*.txt
+auritro@localhost:~/SentryLog$ sudo /usr/local/bin/sentrylog.sh
+Report written to /var/log/sentrylog/security_report_2026-09-15.txt
+auritro@localhost:~/SentryLog$ sudo ls -lh /var/log/sentrylog/
+total 9.4M
+-rw-r--r--. 1 root root    0 Aug  6 18:54 security_report_2026-08-06.txt
+-rw-r--r--. 1 root root 9.4M Sep 15 18:50 security_report_2026-09-15_cron.txt
+-rw-r--r--. 1 root root 8.5K Sep 15 19:12 security_report_2026-09-15.txt
+auritro@localhost:~/SentryLog$ sudo cat /var/log/sentrylog/security_report_$(date +%F).txt
+========================================
+SENTRYLOG SECURITY DIGEST
+========================================
+Host           : localhost.localdomain
+Generated      : 2026-09-15 19:12:32 IST
+Journal window : last 24 hours
+Suspect rule   : more than 5 failures from one IP
+
+----------------------------------------
+1. FAILED AUTHENTICATION (22)
+----------------------------------------
+Sep 15 01:24:53 localhost.localdomain su[20366]: pam_unix(su-l:chauthtok): authentication failure; logname=auritro uid=1000 euid=0 tty=/dev/pts/0 ruser=auritro rhost=  user=dev3
+Sep 15 17:50:43 localhost.localdomain sshd-session[3685]: Invalid user baduser from 192.168.73.1 port 49244
+Sep 15 17:50:45 localhost.localdomain sshd-session[3685]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=192.168.73.1
+Sep 15 17:50:47 localhost.localdomain sshd-session[3685]: Failed password for invalid user baduser from 192.168.73.1 port 49244 ssh2
+Sep 15 17:50:53 localhost.localdomain sshd-session[3685]: Failed password for invalid user baduser from 192.168.73.1 port 49244 ssh2
+Sep 15 17:50:57 localhost.localdomain sshd-session[3685]: Failed password for invalid user baduser from 192.168.73.1 port 49244 ssh2
+Sep 15 17:50:58 localhost.localdomain sshd-session[3685]: PAM 2 more authentication failures; logname= uid=0 euid=0 tty=ssh ruser= rhost=192.168.73.1
+Sep 15 17:51:37 localhost.localdomain su[3696]: pam_unix(su-l:auth): authentication failure; logname=auritro uid=1000 euid=0 tty=/dev/pts/0 ruser=auritro rhost=  user=dev2
+Sep 15 17:51:53 localhost.localdomain su[3707]: pam_unix(su-l:auth): authentication failure; logname=auritro uid=1000 euid=0 tty=/dev/pts/0 ruser=auritro rhost=  user=dev2
+Sep 15 17:52:00 localhost.localdomain su[3711]: pam_unix(su-l:auth): authentication failure; logname=auritro uid=1000 euid=0 tty=/dev/pts/0 ruser=auritro rhost=  user=dev2
+Sep 15 19:10:47 localhost.localdomain sshd-session[5826]: Invalid user baduser from 127.0.0.1 port 59168
+Sep 15 19:10:49 localhost.localdomain sshd-session[5826]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=127.0.0.1
+Sep 15 19:10:50 localhost.localdomain sshd-session[5826]: Failed password for invalid user baduser from 127.0.0.1 port 59168 ssh2
+Sep 15 19:10:55 localhost.localdomain sshd-session[5826]: Failed password for invalid user baduser from 127.0.0.1 port 59168 ssh2
+Sep 15 19:10:59 localhost.localdomain sshd-session[5826]: Failed password for invalid user baduser from 127.0.0.1 port 59168 ssh2
+Sep 15 19:10:59 localhost.localdomain sshd-session[5826]: PAM 2 more authentication failures; logname= uid=0 euid=0 tty=ssh ruser= rhost=127.0.0.1
+Sep 15 19:11:14 localhost.localdomain sshd-session[5834]: Invalid user baduser from 127.0.0.1 port 51240
+Sep 15 19:11:18 localhost.localdomain sshd-session[5834]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=127.0.0.1
+Sep 15 19:11:20 localhost.localdomain sshd-session[5834]: Failed password for invalid user baduser from 127.0.0.1 port 51240 ssh2
+Sep 15 19:11:24 localhost.localdomain sshd-session[5834]: Failed password for invalid user baduser from 127.0.0.1 port 51240 ssh2
+Sep 15 19:11:28 localhost.localdomain sshd-session[5834]: Failed password for invalid user baduser from 127.0.0.1 port 51240 ssh2
+Sep 15 19:11:30 localhost.localdomain sshd-session[5834]: PAM 2 more authentication failures; logname= uid=0 euid=0 tty=ssh ruser= rhost=127.0.0.1
+
+----------------------------------------
+2. SERVICE FAILURES (9)
+----------------------------------------
+Sep 15 17:44:19 localhost.localdomain systemd[4113]: dbus-:1.2-org.gnome.Ptyxis@4.service: Main process exited, code=exited, status=1/FAILURE
+Sep 15 17:44:19 localhost.localdomain systemd[4113]: dbus-:1.2-org.gnome.Ptyxis@4.service: Failed with result 'exit-code'.
+Sep 15 17:44:58 localhost systemd[1]: run-vmblock\x2dfuse.mount: Failed with result 'exit-code'.
+Sep 15 17:45:04 localhost systemd[1]: mcelog.service: Main process exited, code=exited, status=1/FAILURE
+Sep 15 17:45:04 localhost systemd[1]: mcelog.service: Failed with result 'exit-code'.
+Sep 15 17:45:40 localhost.localdomain systemd[2489]: app-gnome-user\x2ddirs\x2dupdate\x2dgtk-2759.scope: Failed with result 'resources'.
+Sep 15 17:45:40 localhost.localdomain systemd[2489]: Failed to start app-gnome-user\x2ddirs\x2dupdate\x2dgtk-2759.scope - Application launched by gnome-session-binary.
+Sep 15 17:45:40 localhost.localdomain systemd[2489]: app-gnome-vmware\x2duser-2761.scope: Failed with result 'resources'.
+Sep 15 17:45:40 localhost.localdomain systemd[2489]: Failed to start app-gnome-vmware\x2duser-2761.scope - Application launched by gnome-session-binary.
+
+----------------------------------------
+3. PRIORITY err AND ABOVE (78464)
+----------------------------------------
+Most frequent messages:
+  78446 kernel: [drm:vmw_kms_fb_create [vmwgfx]] *ERROR* failed to create vmw_framebuffer: -22
+      1 systemd[2489]: Failed to start app-gnome-vmware\x2duser-2761.scope - Application launched by gnome-session-binary.
+      1 systemd[2489]: Failed to start app-gnome-user\x2ddirs\x2dupdate\x2dgtk-2759.scope - Application launched by gnome-session-binary.
+      1 systemd[1]: Failed to mount run-vmblock\x2dfuse.mount - VMware vmblock Fuse Mount.
+      1 sudo[20451]:     dev3 : command not allowed ; TTY=pts/0 ; PWD=/home/dev3 ; USER=root ; COMMAND=list
+      1 sudo[20282]:     dev2 : command not allowed ; TTY=pts/0 ; PWD=/home/dev2 ; USER=root ; COMMAND=list
+      1 kernel: Warning: Unmaintained driver is detected: cnic_init
+      1 kernel: Warning: Unmaintained driver is detected: cnic
+      1 kernel: Warning: Unmaintained driver is detected: bnx2i_mod_init
+      1 kernel: Warning: Unmaintained driver is detected: bnx2i
+
+Most recent 20 entries:
+Sep 15 17:44:12 localhost.localdomain kernel: [drm:vmw_kms_fb_create [vmwgfx]] *ERROR* failed to create vmw_framebuffer: -22
+Sep 15 17:44:12 localhost.localdomain kernel: [drm:vmw_kms_fb_create [vmwgfx]] *ERROR* failed to create vmw_framebuffer: -22
+Sep 15 17:44:17 localhost.localdomain kernel: [drm:vmw_kms_fb_create [vmwgfx]] *ERROR* failed to create vmw_framebuffer: -22
+Sep 15 17:44:17 localhost.localdomain kernel: [drm:vmw_kms_fb_create [vmwgfx]] *ERROR* failed to create vmw_framebuffer: -22
+Sep 15 17:44:19 localhost.localdomain dbus-broker-launch[1178]: Activation request for 'org.freedesktop.ColorManager' failed.
+Sep 15 17:44:21 localhost.localdomain dbus-broker-launch[1178]: Activation request for 'org.freedesktop.nm_dispatcher' failed.
+Sep 15 17:44:29 localhost.localdomain auditd[1139]: plugin /usr/sbin/sedispatch terminated unexpectedly
+-- Boot 5a3a323686f24fa7a35f1438324ae8e0 --
+Sep 15 17:44:44 localhost kernel: [Firmware Bug]: cpu 0, try to use APIC520 (LVT offset 2) for vector 0xf4, but the register is already in use for vector 0x0 on this cpu
+Sep 15 17:44:44 localhost kernel: [Firmware Bug]: cpu 1, try to use APIC520 (LVT offset 2) for vector 0xf4, but the register is already in use for vector 0x0 on this cpu
+Sep 15 17:44:45 localhost kernel: Warning: Unmaintained driver is detected: cnic
+Sep 15 17:44:45 localhost kernel: Warning: Unmaintained driver is detected: cnic_init
+Sep 15 17:44:45 localhost kernel: Warning: Unmaintained driver is detected: bnx2i
+Sep 15 17:44:45 localhost kernel: Warning: Unmaintained driver is detected: bnx2i_mod_init
+Sep 15 17:44:58 localhost systemd[1]: Failed to mount run-vmblock\x2dfuse.mount - VMware vmblock Fuse Mount.
+Sep 15 17:45:06 localhost kernel: piix4_smbus 0000:00:07.3: SMBus base address uninitialized - upgrade BIOS or use force_addr=0xaddr
+Sep 15 17:45:09 localhost alsactl[1315]: alsa-lib main.c:1554:(snd_use_case_mgr_open) error: failed to import hw:0 use case configuration -2
+Sep 15 17:45:30 localhost.localdomain gdm-password][2478]: gkr-pam: unable to locate daemon control file
+Sep 15 17:45:40 localhost.localdomain systemd[2489]: Failed to start app-gnome-user\x2ddirs\x2dupdate\x2dgtk-2759.scope - Application launched by gnome-session-binary.
+Sep 15 17:45:40 localhost.localdomain systemd[2489]: Failed to start app-gnome-vmware\x2duser-2761.scope - Application launched by gnome-session-binary.
+
+----------------------------------------
+4. FAILURES BY SOURCE IP
+----------------------------------------
+  127.0.0.1  12 failures  SUSPECT
+  192.168.73.1  6 failures  SUSPECT
+
+Suspect addresses: 2
+
+----------------------------------------
+5. SUMMARY
+----------------------------------------
+Failed authentication attempts : 22
+Service failures               : 9
+Entries at err or above        : 78464
+
+End of report.
+
+auritro@localhost:~/SentryLog$ sudo touch -d "40 days ago" /var/log/sentrylog/old_report_test.txt
+auritro@localhost:~/SentryLog$ sudo ls -l --time-style=long-iso /var/log/sentrylog/
+total 9596
+-rw-r--r--. 1 root root       0 2026-08-06 19:14 old_report_test.txt
+-rw-r--r--. 1 root root       0 2026-08-06 18:54 security_report_2026-08-06.txt
+-rw-r--r--. 1 root root 9811059 2026-09-15 18:50 security_report_2026-09-15_cron.txt
+-rw-r--r--. 1 root root    8635 2026-09-15 19:12 security_report_2026-09-15.txt
+auritro@localhost:~/SentryLog$ stat /var/log/sentrylog/old_report_test.txt
+stat: cannot statx '/var/log/sentrylog/old_report_test.txt': Permission denied
+auritro@localhost:~/SentryLog$ sudo stat /var/log/sentrylog/old_report_test.txt
+  File: /var/log/sentrylog/old_report_test.txt
+  Size: 0         	Blocks: 0          IO Block: 4096   regular empty file
+Device: 253,0	Inode: 70219214    Links: 1
+Access: (0644/-rw-r--r--)  Uid: (    0/    root)   Gid: (    0/    root)
+Context: unconfined_u:object_r:var_log_t:s0
+Access: 2026-08-06 19:14:53.377439344 +0530
+Modify: 2026-08-06 19:14:53.377439344 +0530
+Change: 2026-09-15 19:14:53.377057253 +0530
+ Birth: 2026-09-15 19:14:53.377057253 +0530
+auritro@localhost:~/SentryLog$ sudo systemd-tmpfiles --clean /etc/tmpfiles.d/sentrylog.conf
+auritro@localhost:~/SentryLog$ sudo ls /var/log/sentrylog/
+old_report_test.txt  security_report_2026-08-06.txt  security_report_2026-09-15_cron.txt  security_report_2026-09-15.txt
+
+auritro@localhost:~/SentryLog$ sudo cp /etc/tmpfiles.d/sentrylog.conf /etc/tmpfiles.d/sentrylog.conf.bak
+auritro@localhost:~/SentryLog$ sudo sed -i 's/ 30d$/ 60s/' /etc/tmpfiles.d/sentrylog.conf
+auritro@localhost:~/SentryLog$ cat /etc/tmpfiles.d/sentrylog.conf
+# SentryLog report retention
+# Installed as /etc/tmpfiles.d/sentrylog.conf
+#
+# Type Path               Mode UID  GID  Age
+d /var/log/sentrylog 0700 root root 60s
+auritro@localhost:~/SentryLog$ sudo touch /var/log/sentrylog/short_age_test.txt
+auritro@localhost:~/SentryLog$ sudo ls -l --time-style=long-iso /var/log/sentrylog/
+total 9596
+-rw-r--r--. 1 root root       0 2026-08-06 19:14 old_report_test.txt
+-rw-r--r--. 1 root root       0 2026-08-06 18:54 security_report_2026-08-06.txt
+-rw-r--r--. 1 root root 9811059 2026-09-15 18:50 security_report_2026-09-15_cron.txt
+-rw-r--r--. 1 root root    8635 2026-09-15 19:12 security_report_2026-09-15.txt
+-rw-r--r--. 1 root root       0 2026-09-15 19:17 short_age_test.txt
+
+auritro@localhost:~/SentryLog$ stat /var/log/sentrylog/old_report_test.txt
+stat: cannot statx '/var/log/sentrylog/old_report_test.txt': Permission denied
+auritro@localhost:~/SentryLog$ sudo stat /var/log/sentrylog/old_report_test.txt
+  File: /var/log/sentrylog/old_report_test.txt
+  Size: 0         	Blocks: 0          IO Block: 4096   regular empty file
+Device: 253,0	Inode: 70219214    Links: 1
+Access: (0644/-rw-r--r--)  Uid: (    0/    root)   Gid: (    0/    root)
+Context: unconfined_u:object_r:var_log_t:s0
+Access: 2026-08-06 19:14:53.377439344 +0530
+Modify: 2026-08-06 19:14:53.377439344 +0530
+Change: 2026-09-15 19:14:53.377057253 +0530
+ Birth: 2026-09-15 19:14:53.377057253 +0530
+auritro@localhost:~/SentryLog$ sudo systemd-tmpfiles --clean /etc/tmpfiles.d/sentrylog.conf
+auritro@localhost:~/SentryLog$ sudo ls /var/log/sentrylog/
+old_report_test.txt  security_report_2026-08-06.txt  security_report_2026-09-15_cron.txt  security_report_2026-09-15.txt
+auritro@localhost:~/SentryLog$ sudo cp /etc/tmpfiles.d/sentrylog.conf /etc/tmpfiles.d/sentrylog.conf.bak
+auritro@localhost:~/SentryLog$ sudo sed -i 's/ 30d$/ 60s/' /etc/tmpfiles.d/sentrylog.conf
+auritro@localhost:~/SentryLog$ cat /etc/tmpfiles.d/sentrylog.conf
+# SentryLog report retention
+# Installed as /etc/tmpfiles.d/sentrylog.conf
+#
+# Type Path               Mode UID  GID  Age
+d /var/log/sentrylog 0700 root root 60s
+auritro@localhost:~/SentryLog$ sudo touch /var/log/sentrylog/short_age_test.txt
+auritro@localhost:~/SentryLog$ sudo ls -l --time-style=long-iso /var/log/sentrylog/
+total 9596
+-rw-r--r--. 1 root root       0 2026-08-06 19:14 old_report_test.txt
+-rw-r--r--. 1 root root       0 2026-08-06 18:54 security_report_2026-08-06.txt
+-rw-r--r--. 1 root root 9811059 2026-09-15 18:50 security_report_2026-09-15_cron.txt
+-rw-r--r--. 1 root root    8635 2026-09-15 19:12 security_report_2026-09-15.txt
+-rw-r--r--. 1 root root       0 2026-09-15 19:17 short_age_test.txt
+auritro@localhost:~/SentryLog$ sudo systemd-tmpfiles --clean /etc/tmpfiles.d/sentrylog.conf
+auritro@localhost:~/SentryLog$ sudo ls -l --time-style=long-iso /var/log/sentrylog/
+total 0
+auritro@localhost:~/SentryLog$ sudo mv /etc/tmpfiles.d/sentrylog.conf.bak /etc/tmpfiles.d/sentrylog.conf
+auritro@localhost:~/SentryLog$ cat /etc/tmpfiles.d/sentrylog.conf
+# SentryLog report retention
+# Installed as /etc/tmpfiles.d/sentrylog.conf
+#
+# Type Path               Mode UID  GID  Age
+d /var/log/sentrylog 0700 root root 30d
+auritro@localhost:~/SentryLog$ sudo systemd-tmpfiles --create /etc/tmpfiles.d/sentrylog.conf
+auritro@localhost:~/SentryLog$ sudo ls -ld /var/log/sentrylog
+drwx------. 2 root root 6 Sep 15 19:17 /var/log/sentrylog
+auritro@localhost:~/SentryLog$ sudo tee /etc/tmpfiles.d/sentrylog.conf > /dev/null << 'EOF'
+# SentryLog report retention
+# Installed as /etc/tmpfiles.d/sentrylog.conf
+#
+# Type Path               Mode UID  GID  Age
+d /var/log/sentrylog 0700 root root 30d
+EOF
+auritro@localhost:~/SentryLog$ sudo /usr/local/bin/sentrylog.sh
+Report written to /var/log/sentrylog/security_report_2026-09-15.txt
+auritro@localhost:~/SentryLog$ sudo /usr/local/bin/sentrylog.sh cron
+Report written to /var/log/sentrylog/security_report_2026-09-15_cron.txt
+auritro@localhost:~/SentryLog$ sudo ls -lh --time-style=long-iso /var/log/sentrylog/
+total 24K
+-rw-r--r--. 1 root root 8.5K 2026-09-15 19:23 security_report_2026-09-15_cron.txt
+-rw-r--r--. 1 root root 8.5K 2026-09-15 19:22 security_report_2026-09-15.txt
+auritro@localhost:~/SentryLog$ sudo cat /var/log/sentrylog/security_report_$(date +%F).txt
+========================================
+SENTRYLOG SECURITY DIGEST
+========================================
+Host           : localhost.localdomain
+Generated      : 2026-09-15 19:22:56 IST
+Journal window : last 24 hours
+Suspect rule   : more than 5 failures from one IP
+
+----------------------------------------
+1. FAILED AUTHENTICATION (22)
+----------------------------------------
+Sep 15 01:24:53 localhost.localdomain su[20366]: pam_unix(su-l:chauthtok): authentication failure; logname=auritro uid=1000 euid=0 tty=/dev/pts/0 ruser=auritro rhost=  user=dev3
+Sep 15 17:50:43 localhost.localdomain sshd-session[3685]: Invalid user baduser from 192.168.73.1 port 49244
+Sep 15 17:50:45 localhost.localdomain sshd-session[3685]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=192.168.73.1
+Sep 15 17:50:47 localhost.localdomain sshd-session[3685]: Failed password for invalid user baduser from 192.168.73.1 port 49244 ssh2
+Sep 15 17:50:53 localhost.localdomain sshd-session[3685]: Failed password for invalid user baduser from 192.168.73.1 port 49244 ssh2
+Sep 15 17:50:57 localhost.localdomain sshd-session[3685]: Failed password for invalid user baduser from 192.168.73.1 port 49244 ssh2
+Sep 15 17:50:58 localhost.localdomain sshd-session[3685]: PAM 2 more authentication failures; logname= uid=0 euid=0 tty=ssh ruser= rhost=192.168.73.1
+Sep 15 17:51:37 localhost.localdomain su[3696]: pam_unix(su-l:auth): authentication failure; logname=auritro uid=1000 euid=0 tty=/dev/pts/0 ruser=auritro rhost=  user=dev2
+Sep 15 17:51:53 localhost.localdomain su[3707]: pam_unix(su-l:auth): authentication failure; logname=auritro uid=1000 euid=0 tty=/dev/pts/0 ruser=auritro rhost=  user=dev2
+Sep 15 17:52:00 localhost.localdomain su[3711]: pam_unix(su-l:auth): authentication failure; logname=auritro uid=1000 euid=0 tty=/dev/pts/0 ruser=auritro rhost=  user=dev2
+Sep 15 19:10:47 localhost.localdomain sshd-session[5826]: Invalid user baduser from 127.0.0.1 port 59168
+Sep 15 19:10:49 localhost.localdomain sshd-session[5826]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=127.0.0.1
+Sep 15 19:10:50 localhost.localdomain sshd-session[5826]: Failed password for invalid user baduser from 127.0.0.1 port 59168 ssh2
+Sep 15 19:10:55 localhost.localdomain sshd-session[5826]: Failed password for invalid user baduser from 127.0.0.1 port 59168 ssh2
+Sep 15 19:10:59 localhost.localdomain sshd-session[5826]: Failed password for invalid user baduser from 127.0.0.1 port 59168 ssh2
+Sep 15 19:10:59 localhost.localdomain sshd-session[5826]: PAM 2 more authentication failures; logname= uid=0 euid=0 tty=ssh ruser= rhost=127.0.0.1
+Sep 15 19:11:14 localhost.localdomain sshd-session[5834]: Invalid user baduser from 127.0.0.1 port 51240
+Sep 15 19:11:18 localhost.localdomain sshd-session[5834]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=127.0.0.1
+Sep 15 19:11:20 localhost.localdomain sshd-session[5834]: Failed password for invalid user baduser from 127.0.0.1 port 51240 ssh2
+Sep 15 19:11:24 localhost.localdomain sshd-session[5834]: Failed password for invalid user baduser from 127.0.0.1 port 51240 ssh2
+Sep 15 19:11:28 localhost.localdomain sshd-session[5834]: Failed password for invalid user baduser from 127.0.0.1 port 51240 ssh2
+Sep 15 19:11:30 localhost.localdomain sshd-session[5834]: PAM 2 more authentication failures; logname= uid=0 euid=0 tty=ssh ruser= rhost=127.0.0.1
+
+----------------------------------------
+2. SERVICE FAILURES (9)
+----------------------------------------
+Sep 15 17:44:19 localhost.localdomain systemd[4113]: dbus-:1.2-org.gnome.Ptyxis@4.service: Main process exited, code=exited, status=1/FAILURE
+Sep 15 17:44:19 localhost.localdomain systemd[4113]: dbus-:1.2-org.gnome.Ptyxis@4.service: Failed with result 'exit-code'.
+Sep 15 17:44:58 localhost systemd[1]: run-vmblock\x2dfuse.mount: Failed with result 'exit-code'.
+Sep 15 17:45:04 localhost systemd[1]: mcelog.service: Main process exited, code=exited, status=1/FAILURE
+Sep 15 17:45:04 localhost systemd[1]: mcelog.service: Failed with result 'exit-code'.
+Sep 15 17:45:40 localhost.localdomain systemd[2489]: app-gnome-user\x2ddirs\x2dupdate\x2dgtk-2759.scope: Failed with result 'resources'.
+Sep 15 17:45:40 localhost.localdomain systemd[2489]: Failed to start app-gnome-user\x2ddirs\x2dupdate\x2dgtk-2759.scope - Application launched by gnome-session-binary.
+Sep 15 17:45:40 localhost.localdomain systemd[2489]: app-gnome-vmware\x2duser-2761.scope: Failed with result 'resources'.
+Sep 15 17:45:40 localhost.localdomain systemd[2489]: Failed to start app-gnome-vmware\x2duser-2761.scope - Application launched by gnome-session-binary.
+
+----------------------------------------
+3. PRIORITY err AND ABOVE (78464)
+----------------------------------------
+Most frequent messages:
+  78446 kernel: [drm:vmw_kms_fb_create [vmwgfx]] *ERROR* failed to create vmw_framebuffer: -22
+      1 systemd[2489]: Failed to start app-gnome-vmware\x2duser-2761.scope - Application launched by gnome-session-binary.
+      1 systemd[2489]: Failed to start app-gnome-user\x2ddirs\x2dupdate\x2dgtk-2759.scope - Application launched by gnome-session-binary.
+      1 systemd[1]: Failed to mount run-vmblock\x2dfuse.mount - VMware vmblock Fuse Mount.
+      1 sudo[20451]:     dev3 : command not allowed ; TTY=pts/0 ; PWD=/home/dev3 ; USER=root ; COMMAND=list
+      1 sudo[20282]:     dev2 : command not allowed ; TTY=pts/0 ; PWD=/home/dev2 ; USER=root ; COMMAND=list
+      1 kernel: Warning: Unmaintained driver is detected: cnic_init
+      1 kernel: Warning: Unmaintained driver is detected: cnic
+      1 kernel: Warning: Unmaintained driver is detected: bnx2i_mod_init
+      1 kernel: Warning: Unmaintained driver is detected: bnx2i
+
+Most recent 20 entries:
+Sep 15 17:44:12 localhost.localdomain kernel: [drm:vmw_kms_fb_create [vmwgfx]] *ERROR* failed to create vmw_framebuffer: -22
+Sep 15 17:44:12 localhost.localdomain kernel: [drm:vmw_kms_fb_create [vmwgfx]] *ERROR* failed to create vmw_framebuffer: -22
+Sep 15 17:44:17 localhost.localdomain kernel: [drm:vmw_kms_fb_create [vmwgfx]] *ERROR* failed to create vmw_framebuffer: -22
+Sep 15 17:44:17 localhost.localdomain kernel: [drm:vmw_kms_fb_create [vmwgfx]] *ERROR* failed to create vmw_framebuffer: -22
+Sep 15 17:44:19 localhost.localdomain dbus-broker-launch[1178]: Activation request for 'org.freedesktop.ColorManager' failed.
+Sep 15 17:44:21 localhost.localdomain dbus-broker-launch[1178]: Activation request for 'org.freedesktop.nm_dispatcher' failed.
+Sep 15 17:44:29 localhost.localdomain auditd[1139]: plugin /usr/sbin/sedispatch terminated unexpectedly
+-- Boot 5a3a323686f24fa7a35f1438324ae8e0 --
+Sep 15 17:44:44 localhost kernel: [Firmware Bug]: cpu 0, try to use APIC520 (LVT offset 2) for vector 0xf4, but the register is already in use for vector 0x0 on this cpu
+Sep 15 17:44:44 localhost kernel: [Firmware Bug]: cpu 1, try to use APIC520 (LVT offset 2) for vector 0xf4, but the register is already in use for vector 0x0 on this cpu
+Sep 15 17:44:45 localhost kernel: Warning: Unmaintained driver is detected: cnic
+Sep 15 17:44:45 localhost kernel: Warning: Unmaintained driver is detected: cnic_init
+Sep 15 17:44:45 localhost kernel: Warning: Unmaintained driver is detected: bnx2i
+Sep 15 17:44:45 localhost kernel: Warning: Unmaintained driver is detected: bnx2i_mod_init
+Sep 15 17:44:58 localhost systemd[1]: Failed to mount run-vmblock\x2dfuse.mount - VMware vmblock Fuse Mount.
+Sep 15 17:45:06 localhost kernel: piix4_smbus 0000:00:07.3: SMBus base address uninitialized - upgrade BIOS or use force_addr=0xaddr
+Sep 15 17:45:09 localhost alsactl[1315]: alsa-lib main.c:1554:(snd_use_case_mgr_open) error: failed to import hw:0 use case configuration -2
+Sep 15 17:45:30 localhost.localdomain gdm-password][2478]: gkr-pam: unable to locate daemon control file
+Sep 15 17:45:40 localhost.localdomain systemd[2489]: Failed to start app-gnome-user\x2ddirs\x2dupdate\x2dgtk-2759.scope - Application launched by gnome-session-binary.
+Sep 15 17:45:40 localhost.localdomain systemd[2489]: Failed to start app-gnome-vmware\x2duser-2761.scope - Application launched by gnome-session-binary.
+
+----------------------------------------
+4. FAILURES BY SOURCE IP
+----------------------------------------
+  127.0.0.1  12 failures  SUSPECT
+  192.168.73.1  6 failures  SUSPECT
+
+Suspect addresses: 2
+
+----------------------------------------
+5. SUMMARY
+----------------------------------------
+Failed authentication attempts : 22
+Service failures               : 9
+Entries at err or above        : 78464
+
+End of report.
+
+auritro@localhost:~/SentryLog$ wc -l -c ~/SentryLog/sentrylog.sh
+ 141 4873 /home/auritro/SentryLog/sentrylog.sh
+auritro@localhost:~/SentryLog$ grep -n 'FAILS' ~/SentryLog/sentrylog.sh
+auritro@localhost:~/SentryLog$ grep -n 'REJECTED CREDENTIALS' ~/SentryLog/sentrylog.sh
+auritro@localhost:~/SentryLog$ grep -n 'MAX_LINES' ~/SentryLog/sentrylog.sh
+17:MAX_LINES=20
+100:        echo "Most recent ${MAX_LINES} entries:"
+101:        tail -n "$MAX_LINES" "$ERRS"
+auritro@localhost:~/SentryLog$ grep -n 'Most frequent messages' ~/SentryLog/sentrylog.sh
+97:        echo "Most frequent messages:"
+auritro@localhost:~/SentryLog$ grep -c '^#' ~/SentryLog/sentrylog.sh
+20
+auritro@localhost:~/SentryLog$ wc -l -c sentrylog.sh
+ 141 4873 sentrylog.sh
+auritro@localhost:~/SentryLog$ bash -n sentrylog.sh; echo $?
+0
+auritro@localhost:~/SentryLog$ grep -n 'FAILS' sentrylog.sh
+auritro@localhost:~/SentryLog$ chmod +x sentrylog.sh
+auritro@localhost:~/SentryLog$ sudo cp sentrylog.sh /usr/local/bin/sentrylog.sh
+auritro@localhost:~/SentryLog$ sudo chmod +x /usr/local/bin/sentrylog.sh
+auritro@localhost:~/SentryLog$ sudo rm -f /var/log/sentrylog/security_report_*.txt
+auritro@localhost:~/SentryLog$ sudo /usr/local/bin/sentrylog.sh
+Report written to /var/log/sentrylog/security_report_2026-09-15.txt
+auritro@localhost:~/SentryLog$ sudo /usr/local/bin/sentrylog.sh cron
+Report written to /var/log/sentrylog/security_report_2026-09-15_cron.txt
+auritro@localhost:~/SentryLog$ sudo sed -n '/^4\./,/Suspect addresses/p' /var/log/sentrylog/security_report_$(date +%F).txt
+4. FAILURES BY SOURCE IP
+----------------------------------------
+  127.0.0.1  12 failures  SUSPECT
+  192.168.73.1  6 failures  SUSPECT
+
+Suspect addresses: 2
+auritro@localhost:~/SentryLog$ wc -l -c ~/SentryLog/sentrylog.sh
+ 141 4873 /home/auritro/SentryLog/sentrylog.sh
+auritro@localhost:~/SentryLog$ grep -c 'FAILS' ~/SentryLog/sentrylog.sh
+0
+auritro@localhost:~/SentryLog$ grep -c 'FAILS' /usr/local/bin/sentrylog.sh
+0
+auritro@localhost:~/SentryLog$ 
+
+auritro@localhost:~/SentryLog$ wc -l -c ~/SentryLog/sentrylog.sh
+ 141 4873 /home/auritro/SentryLog/sentrylog.sh
+auritro@localhost:~/SentryLog$ grep -n 'FAILS' ~/SentryLog/sentrylog.sh
+auritro@localhost:~/SentryLog$ grep -n 'REJECTED CREDENTIALS' ~/SentryLog/sentrylog.sh
+auritro@localhost:~/SentryLog$ grep -n 'MAX_LINES' ~/SentryLog/sentrylog.sh
+17:MAX_LINES=20
+100:        echo "Most recent ${MAX_LINES} entries:"
+101:        tail -n "$MAX_LINES" "$ERRS"
+auritro@localhost:~/SentryLog$ grep -n 'Most frequent messages' ~/SentryLog/sentrylog.sh
+97:        echo "Most frequent messages:"
+auritro@localhost:~/SentryLog$ grep -c '^#' ~/SentryLog/sentrylog.sh
+20
+auritro@localhost:~/SentryLog$ wc -l -c sentrylog.sh
+ 141 4873 sentrylog.sh
+auritro@localhost:~/SentryLog$ bash -n sentrylog.sh; echo $?
+0
+auritro@localhost:~/SentryLog$ grep -n 'FAILS' sentrylog.sh
+auritro@localhost:~/SentryLog$ chmod +x sentrylog.sh
+auritro@localhost:~/SentryLog$ sudo cp sentrylog.sh /usr/local/bin/sentrylog.sh
+auritro@localhost:~/SentryLog$ sudo chmod +x /usr/local/bin/sentrylog.sh
+auritro@localhost:~/SentryLog$ sudo rm -f /var/log/sentrylog/security_report_*.txt
+auritro@localhost:~/SentryLog$ sudo /usr/local/bin/sentrylog.sh
+Report written to /var/log/sentrylog/security_report_2026-09-15.txt
+auritro@localhost:~/SentryLog$ sudo /usr/local/bin/sentrylog.sh cron
+Report written to /var/log/sentrylog/security_report_2026-09-15_cron.txt
+auritro@localhost:~/SentryLog$ sudo sed -n '/^4\./,/Suspect addresses/p' /var/log/sentrylog/security_report_$(date +%F).txt
+4. FAILURES BY SOURCE IP
+----------------------------------------
+  127.0.0.1  12 failures  SUSPECT
+  192.168.73.1  6 failures  SUSPECT
+
+Suspect addresses: 2
+auritro@localhost:~/SentryLog$ wc -l -c ~/SentryLog/sentrylog.sh
+ 141 4873 /home/auritro/SentryLog/sentrylog.sh
+auritro@localhost:~/SentryLog$ grep -c 'FAILS' ~/SentryLog/sentrylog.sh
+0
+auritro@localhost:~/SentryLog$ grep -c 'FAILS' /usr/local/bin/sentrylog.sh
+0
+auritro@localhost:~/SentryLog$ cd ~/SentryLog
+auritro@localhost:~/SentryLog$ cp sentrylog.sh sentrylog.sh.bak
+auritro@localhost:~/SentryLog$ sed -i '/^AUTH="/a FAILS="${REPORT_DIR}/.fails.tmp"' sentrylog.sh
+auritro@localhost:~/SentryLog$ sed -i '/^AUTH_COUNT=/i grep -E "Failed password|Failed publickey" "$AUTH" > "$FAILS"\n' sentrylog.sh
+auritro@localhost:~/SentryLog$ sed -i '/IP_LIST=/s/\$AUTH/\$FAILS/' sentrylog.sh
+auritro@localhost:~/SentryLog$ sed -i '/grep -c "\$IP"/s/\$AUTH/\$FAILS/' sentrylog.sh
+auritro@localhost:~/SentryLog$ sed -i 's|^rm -f "\$WORK" "\$AUTH" "\$ERRS"$|rm -f "$WORK" "$AUTH" "$FAILS" "$ERRS"|' sentrylog.sh
+auritro@localhost:~/SentryLog$ sed -i 's/4\. FAILURES BY SOURCE IP/4. REJECTED CREDENTIALS BY SOURCE IP/' sentrylog.sh
+auritro@localhost:~/SentryLog$ sed -i 's/\${COUNT} failures /${COUNT} rejected /g' sentrylog.sh
+auritro@localhost:~/SentryLog$ grep -n 'FAILS' sentrylog.sh
+41:FAILS="${REPORT_DIR}/.fails.tmp"
+54:grep -E "Failed password|Failed publickey" "$AUTH" > "$FAILS"
+111:    IP_LIST=$(grep -oE '([0-9]{1,3}\.){3}[0-9]{1,3}' "$FAILS" | sort -u)
+119:            COUNT=$(grep -c "$IP" "$FAILS")
+142:rm -f "$WORK" "$AUTH" "$FAILS" "$ERRS"
+auritro@localhost:~/SentryLog$ bash -n sentrylog.sh; echo $?
+0
+auritro@localhost:~/SentryLog$ wc -l -c sentrylog.sh
+ 144 4992 sentrylog.sh
+auritro@localhost:~/SentryLog$ sudo cp sentrylog.sh /usr/local/bin/sentrylog.sh
+auritro@localhost:~/SentryLog$ sudo chmod +x /usr/local/bin/sentrylog.sh
+auritro@localhost:~/SentryLog$ grep -c 'FAILS' /usr/local/bin/sentrylog.sh
+5
+auritro@localhost:~/SentryLog$ sudo rm -f /var/log/sentrylog/security_report_*.txt
+auritro@localhost:~/SentryLog$ sudo /usr/local/bin/sentrylog.sh
+Report written to /var/log/sentrylog/security_report_2026-09-15.txt
+auritro@localhost:~/SentryLog$ sudo /usr/local/bin/sentrylog.sh cron
+Report written to /var/log/sentrylog/security_report_2026-09-15_cron.txt
+auritro@localhost:~/SentryLog$ sudo sed -n '/^4\./,/Suspect addresses/p' /var/log/sentrylog/security_report_$(date +%F).txt
+4. REJECTED CREDENTIALS BY SOURCE IP
+----------------------------------------
+  127.0.0.1  6 rejected  SUSPECT
+  192.168.73.1  3 rejected  ok
+
+Suspect addresses: 1
+auritro@localhost:~/SentryLog$ sudo touch -d "40 days ago" /var/log/sentrylog/ctime_demo.txt
+auritro@localhost:~/SentryLog$ sudo stat /var/log/sentrylog/ctime_demo.txt
+  File: /var/log/sentrylog/ctime_demo.txt
+  Size: 0         	Blocks: 0          IO Block: 4096   regular empty file
+Device: 253,0	Inode: 68449743    Links: 1
+Access: (0644/-rw-r--r--)  Uid: (    0/    root)   Gid: (    0/    root)
+Context: unconfined_u:object_r:var_log_t:s0
+Access: 2026-08-06 19:37:48.064907975 +0530
+Modify: 2026-08-06 19:37:48.064907975 +0530
+Change: 2026-09-15 19:37:48.064199223 +0530
+ Birth: 2026-09-15 19:37:48.064199223 +0530
+
+auritro@localhost:~/SentryLog$ sudo systemd-tmpfiles --clean /etc/tmpfiles.d/sentrylog.conf
+auritro@localhost:~/SentryLog$ sudo ls -l /var/log/sentrylog/
+total 24
+-rw-r--r--. 1 root root    0 Aug  6 19:37 ctime_demo.txt
+-rw-r--r--. 1 root root 8641 Sep 15 19:37 security_report_2026-09-15_cron.txt
+-rw-r--r--. 1 root root 8641 Sep 15 19:37 security_report_2026-09-15.txt
+auritro@localhost:~/SentryLog$ sudo rm -f /var/log/sentrylog/ctime_demo.txt
+
+auritro@localhost:~/SentryLog$ sudo cat /var/log/sentrylog/security_report_$(date +%F).txt
+========================================
+SENTRYLOG SECURITY DIGEST
+========================================
+Host           : localhost.localdomain
+Generated      : 2026-09-15 19:37:00 IST
+Journal window : last 24 hours
+Suspect rule   : more than 5 failures from one IP
+
+----------------------------------------
+1. FAILED AUTHENTICATION (22)
+----------------------------------------
+Sep 15 01:24:53 localhost.localdomain su[20366]: pam_unix(su-l:chauthtok): authentication failure; logname=auritro uid=1000 euid=0 tty=/dev/pts/0 ruser=auritro rhost=  user=dev3
+Sep 15 17:50:43 localhost.localdomain sshd-session[3685]: Invalid user baduser from 192.168.73.1 port 49244
+Sep 15 17:50:45 localhost.localdomain sshd-session[3685]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=192.168.73.1
+Sep 15 17:50:47 localhost.localdomain sshd-session[3685]: Failed password for invalid user baduser from 192.168.73.1 port 49244 ssh2
+Sep 15 17:50:53 localhost.localdomain sshd-session[3685]: Failed password for invalid user baduser from 192.168.73.1 port 49244 ssh2
+Sep 15 17:50:57 localhost.localdomain sshd-session[3685]: Failed password for invalid user baduser from 192.168.73.1 port 49244 ssh2
+Sep 15 17:50:58 localhost.localdomain sshd-session[3685]: PAM 2 more authentication failures; logname= uid=0 euid=0 tty=ssh ruser= rhost=192.168.73.1
+Sep 15 17:51:37 localhost.localdomain su[3696]: pam_unix(su-l:auth): authentication failure; logname=auritro uid=1000 euid=0 tty=/dev/pts/0 ruser=auritro rhost=  user=dev2
+Sep 15 17:51:53 localhost.localdomain su[3707]: pam_unix(su-l:auth): authentication failure; logname=auritro uid=1000 euid=0 tty=/dev/pts/0 ruser=auritro rhost=  user=dev2
+Sep 15 17:52:00 localhost.localdomain su[3711]: pam_unix(su-l:auth): authentication failure; logname=auritro uid=1000 euid=0 tty=/dev/pts/0 ruser=auritro rhost=  user=dev2
+Sep 15 19:10:47 localhost.localdomain sshd-session[5826]: Invalid user baduser from 127.0.0.1 port 59168
+Sep 15 19:10:49 localhost.localdomain sshd-session[5826]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=127.0.0.1
+Sep 15 19:10:50 localhost.localdomain sshd-session[5826]: Failed password for invalid user baduser from 127.0.0.1 port 59168 ssh2
+Sep 15 19:10:55 localhost.localdomain sshd-session[5826]: Failed password for invalid user baduser from 127.0.0.1 port 59168 ssh2
+Sep 15 19:10:59 localhost.localdomain sshd-session[5826]: Failed password for invalid user baduser from 127.0.0.1 port 59168 ssh2
+Sep 15 19:10:59 localhost.localdomain sshd-session[5826]: PAM 2 more authentication failures; logname= uid=0 euid=0 tty=ssh ruser= rhost=127.0.0.1
+Sep 15 19:11:14 localhost.localdomain sshd-session[5834]: Invalid user baduser from 127.0.0.1 port 51240
+Sep 15 19:11:18 localhost.localdomain sshd-session[5834]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=127.0.0.1
+Sep 15 19:11:20 localhost.localdomain sshd-session[5834]: Failed password for invalid user baduser from 127.0.0.1 port 51240 ssh2
+Sep 15 19:11:24 localhost.localdomain sshd-session[5834]: Failed password for invalid user baduser from 127.0.0.1 port 51240 ssh2
+Sep 15 19:11:28 localhost.localdomain sshd-session[5834]: Failed password for invalid user baduser from 127.0.0.1 port 51240 ssh2
+Sep 15 19:11:30 localhost.localdomain sshd-session[5834]: PAM 2 more authentication failures; logname= uid=0 euid=0 tty=ssh ruser= rhost=127.0.0.1
+
+----------------------------------------
+2. SERVICE FAILURES (9)
+----------------------------------------
+Sep 15 17:44:19 localhost.localdomain systemd[4113]: dbus-:1.2-org.gnome.Ptyxis@4.service: Main process exited, code=exited, status=1/FAILURE
+Sep 15 17:44:19 localhost.localdomain systemd[4113]: dbus-:1.2-org.gnome.Ptyxis@4.service: Failed with result 'exit-code'.
+Sep 15 17:44:58 localhost systemd[1]: run-vmblock\x2dfuse.mount: Failed with result 'exit-code'.
+Sep 15 17:45:04 localhost systemd[1]: mcelog.service: Main process exited, code=exited, status=1/FAILURE
+Sep 15 17:45:04 localhost systemd[1]: mcelog.service: Failed with result 'exit-code'.
+Sep 15 17:45:40 localhost.localdomain systemd[2489]: app-gnome-user\x2ddirs\x2dupdate\x2dgtk-2759.scope: Failed with result 'resources'.
+Sep 15 17:45:40 localhost.localdomain systemd[2489]: Failed to start app-gnome-user\x2ddirs\x2dupdate\x2dgtk-2759.scope - Application launched by gnome-session-binary.
+Sep 15 17:45:40 localhost.localdomain systemd[2489]: app-gnome-vmware\x2duser-2761.scope: Failed with result 'resources'.
+Sep 15 17:45:40 localhost.localdomain systemd[2489]: Failed to start app-gnome-vmware\x2duser-2761.scope - Application launched by gnome-session-binary.
+
+----------------------------------------
+3. PRIORITY err AND ABOVE (78464)
+----------------------------------------
+Most frequent messages:
+  78446 kernel: [drm:vmw_kms_fb_create [vmwgfx]] *ERROR* failed to create vmw_framebuffer: -22
+      1 systemd[2489]: Failed to start app-gnome-vmware\x2duser-2761.scope - Application launched by gnome-session-binary.
+      1 systemd[2489]: Failed to start app-gnome-user\x2ddirs\x2dupdate\x2dgtk-2759.scope - Application launched by gnome-session-binary.
+      1 systemd[1]: Failed to mount run-vmblock\x2dfuse.mount - VMware vmblock Fuse Mount.
+      1 sudo[20451]:     dev3 : command not allowed ; TTY=pts/0 ; PWD=/home/dev3 ; USER=root ; COMMAND=list
+      1 sudo[20282]:     dev2 : command not allowed ; TTY=pts/0 ; PWD=/home/dev2 ; USER=root ; COMMAND=list
+      1 kernel: Warning: Unmaintained driver is detected: cnic_init
+      1 kernel: Warning: Unmaintained driver is detected: cnic
+      1 kernel: Warning: Unmaintained driver is detected: bnx2i_mod_init
+      1 kernel: Warning: Unmaintained driver is detected: bnx2i
+
+Most recent 20 entries:
+Sep 15 17:44:12 localhost.localdomain kernel: [drm:vmw_kms_fb_create [vmwgfx]] *ERROR* failed to create vmw_framebuffer: -22
+Sep 15 17:44:12 localhost.localdomain kernel: [drm:vmw_kms_fb_create [vmwgfx]] *ERROR* failed to create vmw_framebuffer: -22
+Sep 15 17:44:17 localhost.localdomain kernel: [drm:vmw_kms_fb_create [vmwgfx]] *ERROR* failed to create vmw_framebuffer: -22
+Sep 15 17:44:17 localhost.localdomain kernel: [drm:vmw_kms_fb_create [vmwgfx]] *ERROR* failed to create vmw_framebuffer: -22
+Sep 15 17:44:19 localhost.localdomain dbus-broker-launch[1178]: Activation request for 'org.freedesktop.ColorManager' failed.
+Sep 15 17:44:21 localhost.localdomain dbus-broker-launch[1178]: Activation request for 'org.freedesktop.nm_dispatcher' failed.
+Sep 15 17:44:29 localhost.localdomain auditd[1139]: plugin /usr/sbin/sedispatch terminated unexpectedly
+-- Boot 5a3a323686f24fa7a35f1438324ae8e0 --
+Sep 15 17:44:44 localhost kernel: [Firmware Bug]: cpu 0, try to use APIC520 (LVT offset 2) for vector 0xf4, but the register is already in use for vector 0x0 on this cpu
+Sep 15 17:44:44 localhost kernel: [Firmware Bug]: cpu 1, try to use APIC520 (LVT offset 2) for vector 0xf4, but the register is already in use for vector 0x0 on this cpu
+Sep 15 17:44:45 localhost kernel: Warning: Unmaintained driver is detected: cnic
+Sep 15 17:44:45 localhost kernel: Warning: Unmaintained driver is detected: cnic_init
+Sep 15 17:44:45 localhost kernel: Warning: Unmaintained driver is detected: bnx2i
+Sep 15 17:44:45 localhost kernel: Warning: Unmaintained driver is detected: bnx2i_mod_init
+Sep 15 17:44:58 localhost systemd[1]: Failed to mount run-vmblock\x2dfuse.mount - VMware vmblock Fuse Mount.
+Sep 15 17:45:06 localhost kernel: piix4_smbus 0000:00:07.3: SMBus base address uninitialized - upgrade BIOS or use force_addr=0xaddr
+Sep 15 17:45:09 localhost alsactl[1315]: alsa-lib main.c:1554:(snd_use_case_mgr_open) error: failed to import hw:0 use case configuration -2
+Sep 15 17:45:30 localhost.localdomain gdm-password][2478]: gkr-pam: unable to locate daemon control file
+Sep 15 17:45:40 localhost.localdomain systemd[2489]: Failed to start app-gnome-user\x2ddirs\x2dupdate\x2dgtk-2759.scope - Application launched by gnome-session-binary.
+Sep 15 17:45:40 localhost.localdomain systemd[2489]: Failed to start app-gnome-vmware\x2duser-2761.scope - Application launched by gnome-session-binary.
+
+----------------------------------------
+4. REJECTED CREDENTIALS BY SOURCE IP
+----------------------------------------
+  127.0.0.1  6 rejected  SUSPECT
+  192.168.73.1  3 rejected  ok
+
+Suspect addresses: 1
+
+----------------------------------------
+5. SUMMARY
+----------------------------------------
+Failed authentication attempts : 22
+Service failures               : 9
+Entries at err or above        : 78464
+
+End of report.
+
+auritro@localhost:~/SentryLog$ rm -f sentrylog.sh.bak
+auritro@localhost:~/SentryLog$ sudo cp /var/log/sentrylog/security_report_$(date +%F).txt .
+auritro@localhost:~/SentryLog$ sudo chown auritro:auritro security_report_$(date +%F).txt
+auritro@localhost:~/SentryLog$ ls -lh
+total 20K
+-rw-r--r--. 1 auritro auritro 8.5K Sep 15 19:45 security_report_2026-09-15.txt
+-rwxr-xr-x. 1 auritro auritro 4.9K Sep 15 19:35 sentrylog.sh
+-rw-r--r--. 1 auritro auritro    0 Sep 15 19:10 ssh
+drwxr-xr-x. 2 auritro auritro  107 Sep 15 17:30 units
+
+auritro@localhost:~/SentryLog$ rm -f ~/SentryLog/ssh
+auritro@localhost:~/SentryLog$ sudo touch -d "40 days ago" /var/log/sentrylog/ctime_demo.txt
+[sudo] password for auritro: 
+auritro@localhost:~/SentryLog$ sudo stat /var/log/sentrylog/ctime_demo.txt
+  File: /var/log/sentrylog/ctime_demo.txt
+  Size: 0         	Blocks: 0          IO Block: 4096   regular empty file
+Device: 253,0	Inode: 69021148    Links: 1
+Access: (0644/-rw-r--r--)  Uid: (    0/    root)   Gid: (    0/    root)
+Context: unconfined_u:object_r:var_log_t:s0
+Access: 2026-08-06 22:56:27.223866261 +0530
+Modify: 2026-08-06 22:56:27.223866261 +0530
+Change: 2026-09-15 22:56:27.223071387 +0530
+ Birth: 2026-09-15 22:56:27.223071387 +0530
+auritro@localhost:~/SentryLog$ sudo rm -f /var/log/sentrylog/ctime_demo.txt

@@ -1,0 +1,102 @@
+========================================
+SENTRYLOG SECURITY DIGEST
+========================================
+Host           : localhost.localdomain
+Generated      : 2026-09-15 19:37:00 IST
+Journal window : last 24 hours
+Suspect rule   : more than 5 failures from one IP
+
+----------------------------------------
+1. FAILED AUTHENTICATION (22)
+----------------------------------------
+Sep 15 01:24:53 localhost.localdomain su[20366]: pam_unix(su-l:chauthtok): authentication failure; logname=auritro uid=1000 euid=0 tty=/dev/pts/0 ruser=auritro rhost=  user=dev3
+Sep 15 17:50:43 localhost.localdomain sshd-session[3685]: Invalid user baduser from 192.168.73.1 port 49244
+Sep 15 17:50:45 localhost.localdomain sshd-session[3685]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=192.168.73.1
+Sep 15 17:50:47 localhost.localdomain sshd-session[3685]: Failed password for invalid user baduser from 192.168.73.1 port 49244 ssh2
+Sep 15 17:50:53 localhost.localdomain sshd-session[3685]: Failed password for invalid user baduser from 192.168.73.1 port 49244 ssh2
+Sep 15 17:50:57 localhost.localdomain sshd-session[3685]: Failed password for invalid user baduser from 192.168.73.1 port 49244 ssh2
+Sep 15 17:50:58 localhost.localdomain sshd-session[3685]: PAM 2 more authentication failures; logname= uid=0 euid=0 tty=ssh ruser= rhost=192.168.73.1
+Sep 15 17:51:37 localhost.localdomain su[3696]: pam_unix(su-l:auth): authentication failure; logname=auritro uid=1000 euid=0 tty=/dev/pts/0 ruser=auritro rhost=  user=dev2
+Sep 15 17:51:53 localhost.localdomain su[3707]: pam_unix(su-l:auth): authentication failure; logname=auritro uid=1000 euid=0 tty=/dev/pts/0 ruser=auritro rhost=  user=dev2
+Sep 15 17:52:00 localhost.localdomain su[3711]: pam_unix(su-l:auth): authentication failure; logname=auritro uid=1000 euid=0 tty=/dev/pts/0 ruser=auritro rhost=  user=dev2
+Sep 15 19:10:47 localhost.localdomain sshd-session[5826]: Invalid user baduser from 127.0.0.1 port 59168
+Sep 15 19:10:49 localhost.localdomain sshd-session[5826]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=127.0.0.1
+Sep 15 19:10:50 localhost.localdomain sshd-session[5826]: Failed password for invalid user baduser from 127.0.0.1 port 59168 ssh2
+Sep 15 19:10:55 localhost.localdomain sshd-session[5826]: Failed password for invalid user baduser from 127.0.0.1 port 59168 ssh2
+Sep 15 19:10:59 localhost.localdomain sshd-session[5826]: Failed password for invalid user baduser from 127.0.0.1 port 59168 ssh2
+Sep 15 19:10:59 localhost.localdomain sshd-session[5826]: PAM 2 more authentication failures; logname= uid=0 euid=0 tty=ssh ruser= rhost=127.0.0.1
+Sep 15 19:11:14 localhost.localdomain sshd-session[5834]: Invalid user baduser from 127.0.0.1 port 51240
+Sep 15 19:11:18 localhost.localdomain sshd-session[5834]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=127.0.0.1
+Sep 15 19:11:20 localhost.localdomain sshd-session[5834]: Failed password for invalid user baduser from 127.0.0.1 port 51240 ssh2
+Sep 15 19:11:24 localhost.localdomain sshd-session[5834]: Failed password for invalid user baduser from 127.0.0.1 port 51240 ssh2
+Sep 15 19:11:28 localhost.localdomain sshd-session[5834]: Failed password for invalid user baduser from 127.0.0.1 port 51240 ssh2
+Sep 15 19:11:30 localhost.localdomain sshd-session[5834]: PAM 2 more authentication failures; logname= uid=0 euid=0 tty=ssh ruser= rhost=127.0.0.1
+
+----------------------------------------
+2. SERVICE FAILURES (9)
+----------------------------------------
+Sep 15 17:44:19 localhost.localdomain systemd[4113]: dbus-:1.2-org.gnome.Ptyxis@4.service: Main process exited, code=exited, status=1/FAILURE
+Sep 15 17:44:19 localhost.localdomain systemd[4113]: dbus-:1.2-org.gnome.Ptyxis@4.service: Failed with result 'exit-code'.
+Sep 15 17:44:58 localhost systemd[1]: run-vmblock\x2dfuse.mount: Failed with result 'exit-code'.
+Sep 15 17:45:04 localhost systemd[1]: mcelog.service: Main process exited, code=exited, status=1/FAILURE
+Sep 15 17:45:04 localhost systemd[1]: mcelog.service: Failed with result 'exit-code'.
+Sep 15 17:45:40 localhost.localdomain systemd[2489]: app-gnome-user\x2ddirs\x2dupdate\x2dgtk-2759.scope: Failed with result 'resources'.
+Sep 15 17:45:40 localhost.localdomain systemd[2489]: Failed to start app-gnome-user\x2ddirs\x2dupdate\x2dgtk-2759.scope - Application launched by gnome-session-binary.
+Sep 15 17:45:40 localhost.localdomain systemd[2489]: app-gnome-vmware\x2duser-2761.scope: Failed with result 'resources'.
+Sep 15 17:45:40 localhost.localdomain systemd[2489]: Failed to start app-gnome-vmware\x2duser-2761.scope - Application launched by gnome-session-binary.
+
+----------------------------------------
+3. PRIORITY err AND ABOVE (78464)
+----------------------------------------
+Most frequent messages:
+  78446 kernel: [drm:vmw_kms_fb_create [vmwgfx]] *ERROR* failed to create vmw_framebuffer: -22
+      1 systemd[2489]: Failed to start app-gnome-vmware\x2duser-2761.scope - Application launched by gnome-session-binary.
+      1 systemd[2489]: Failed to start app-gnome-user\x2ddirs\x2dupdate\x2dgtk-2759.scope - Application launched by gnome-session-binary.
+      1 systemd[1]: Failed to mount run-vmblock\x2dfuse.mount - VMware vmblock Fuse Mount.
+      1 sudo[20451]:     dev3 : command not allowed ; TTY=pts/0 ; PWD=/home/dev3 ; USER=root ; COMMAND=list
+      1 sudo[20282]:     dev2 : command not allowed ; TTY=pts/0 ; PWD=/home/dev2 ; USER=root ; COMMAND=list
+      1 kernel: Warning: Unmaintained driver is detected: cnic_init
+      1 kernel: Warning: Unmaintained driver is detected: cnic
+      1 kernel: Warning: Unmaintained driver is detected: bnx2i_mod_init
+      1 kernel: Warning: Unmaintained driver is detected: bnx2i
+
+Most recent 20 entries:
+Sep 15 17:44:12 localhost.localdomain kernel: [drm:vmw_kms_fb_create [vmwgfx]] *ERROR* failed to create vmw_framebuffer: -22
+Sep 15 17:44:12 localhost.localdomain kernel: [drm:vmw_kms_fb_create [vmwgfx]] *ERROR* failed to create vmw_framebuffer: -22
+Sep 15 17:44:17 localhost.localdomain kernel: [drm:vmw_kms_fb_create [vmwgfx]] *ERROR* failed to create vmw_framebuffer: -22
+Sep 15 17:44:17 localhost.localdomain kernel: [drm:vmw_kms_fb_create [vmwgfx]] *ERROR* failed to create vmw_framebuffer: -22
+Sep 15 17:44:19 localhost.localdomain dbus-broker-launch[1178]: Activation request for 'org.freedesktop.ColorManager' failed.
+Sep 15 17:44:21 localhost.localdomain dbus-broker-launch[1178]: Activation request for 'org.freedesktop.nm_dispatcher' failed.
+Sep 15 17:44:29 localhost.localdomain auditd[1139]: plugin /usr/sbin/sedispatch terminated unexpectedly
+-- Boot 5a3a323686f24fa7a35f1438324ae8e0 --
+Sep 15 17:44:44 localhost kernel: [Firmware Bug]: cpu 0, try to use APIC520 (LVT offset 2) for vector 0xf4, but the register is already in use for vector 0x0 on this cpu
+Sep 15 17:44:44 localhost kernel: [Firmware Bug]: cpu 1, try to use APIC520 (LVT offset 2) for vector 0xf4, but the register is already in use for vector 0x0 on this cpu
+Sep 15 17:44:45 localhost kernel: Warning: Unmaintained driver is detected: cnic
+Sep 15 17:44:45 localhost kernel: Warning: Unmaintained driver is detected: cnic_init
+Sep 15 17:44:45 localhost kernel: Warning: Unmaintained driver is detected: bnx2i
+Sep 15 17:44:45 localhost kernel: Warning: Unmaintained driver is detected: bnx2i_mod_init
+Sep 15 17:44:58 localhost systemd[1]: Failed to mount run-vmblock\x2dfuse.mount - VMware vmblock Fuse Mount.
+Sep 15 17:45:06 localhost kernel: piix4_smbus 0000:00:07.3: SMBus base address uninitialized - upgrade BIOS or use force_addr=0xaddr
+Sep 15 17:45:09 localhost alsactl[1315]: alsa-lib main.c:1554:(snd_use_case_mgr_open) error: failed to import hw:0 use case configuration -2
+Sep 15 17:45:30 localhost.localdomain gdm-password][2478]: gkr-pam: unable to locate daemon control file
+Sep 15 17:45:40 localhost.localdomain systemd[2489]: Failed to start app-gnome-user\x2ddirs\x2dupdate\x2dgtk-2759.scope - Application launched by gnome-session-binary.
+Sep 15 17:45:40 localhost.localdomain systemd[2489]: Failed to start app-gnome-vmware\x2duser-2761.scope - Application launched by gnome-session-binary.
+
+----------------------------------------
+4. REJECTED CREDENTIALS BY SOURCE IP
+----------------------------------------
+  127.0.0.1  6 rejected  SUSPECT
+  192.168.73.1  3 rejected  ok
+
+Suspect addresses: 1
+
+----------------------------------------
+5. SUMMARY
+----------------------------------------
+Failed authentication attempts : 22
+Service failures               : 9
+Entries at err or above        : 78464
+
+End of report.
+
+
